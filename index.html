@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Recommendation Predictor</title>
+    <script>
+        // Function to calculate months difference
+        function calculateMonths() {
+            const recencyDate = document.getElementById("Recency_Date").value;
+            if (recencyDate) {
+                const recencyDateObj = new Date(recencyDate);
+                const currentDateObj = new Date();
+
+                // Calculate the difference in months between current date and recency date
+                const monthsDifference = (currentDateObj.getFullYear() - recencyDateObj.getFullYear()) * 12 + currentDateObj.getMonth() - recencyDateObj.getMonth();
+
+                // Set the number of months in the 'Recency' field
+                document.getElementById("Recency_Months").value = monthsDifference;
+
+                // Automatically set Frequency and Time based on months
+                document.getElementById("Frequency").value = monthsDifference;  // Example: Frequency based on number of months
+                document.getElementById("Time").value = monthsDifference;  // Example: Time since diagnosis could be same or calculated
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Healthcare Recommendation Predictor</h1>
+    
+    <!-- Form to take input from the user -->
+    <form action="/predict" method="POST">
+        <!-- Recency input with Date Picker and Month Input -->
+        <label for="Recency">Recency (Time Since Last Visit):</label><br>
+        <label for="Recency_Date">Last Visit Date:</label>
+        <!-- Date picker: Only allows dates from the last 10 years -->
+        <input type="date" id="Recency_Date" name="Recency(Date)" max="{{ today }}" required onchange="calculateMonths()"><br><br>
+        
+        <label for="Recency_Months">Months Since Last Visit:</label>
+        <!-- Automatically populated when Recency Date is provided -->
+        <input type="number" id="Recency_Months" name="Recency(Months)" readonly><br><br>
+
+        <!-- Frequency input (Number of Visits) -->
+        <label for="Frequency">Frequency (Number of Visits in the Last Year):</label>
+        <input type="number" id="Frequency" name="Frequency" min="0" required><br><br>
+
+        <!-- Class input (Health Risk) -->
+        <label for="Class">Health Risk:</label>
+        <select name="Class" required>
+            <option value="1">Yes, I have health risk</option>
+            <option value="0">No, I have no health risk</option>
+        </select><br><br>
+
+        <!-- Time input (Time Since Diagnosis or Treatment) -->
+        <label for="Time">Time Since Diagnosis or Treatment (in Months or Years):</label>
+        <input type="number" id="Time" name="Time" min="0" required><br><br>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    <!-- Display prediction result if available -->
+    {% if prediction_message %}
+        <h2>Prediction: {{ prediction_message }}</h2>
+    {% endif %}
+</body>
+</html>
